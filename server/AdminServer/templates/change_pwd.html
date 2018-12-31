@@ -1,0 +1,55 @@
+<html>
+  <head>
+  <title>TransportC2 Login</title>
+    <script src="/static/js/transport.js"></script>
+    <link rel="stylesheet" type="text/css" href="/static/css/transport.css">
+  </head>
+
+  <body>
+    <table height="100%" width="100%" cellpadding="0" cellspacing="0">
+      <tr style="border-bottom:thin solid black;" height="65px">
+        <td  width="175px" class="heading" style="border-right:thin solid black;padding-top:5px;">
+          TransportC2
+          <hr width="120px">
+          Admin Interface
+        </td>
+	    <td style="background-color:white;" colspan="2"></td>
+      </tr>
+
+      <tr>
+	    <td style="border-right:thin solid black;border-top:thin solid black;" class="nav">
+          <br>
+          <input class="nav_button" type="button" onclick="Home();" value="Home">
+          <br><br>
+          <input class="nav_button" type="button" onclick="AddAdmin();" value="Add Admin">
+          <br><br>
+          <input class="nav_button" type="button" onclick="PassChange();" value="Change Password">
+          <br><br>
+          <input class="nav_button" type="button" onclick="LogOut();" value="Log Out">
+          <br><br>
+        </td>
+        <!-- Login Form Form -->
+        <td style="border-top:thin solid black;">
+          <div style="padding-left:50px;padding-top:50px;">
+            <form method="post" class="login_form">
+              <br>
+              <p class="heading3">Change Password</p>
+              Verify Username:<br>
+              <input type="text" name="username" value="" size="50" style="background:white;"><br><br>
+              Password:<br>
+              <input type="password" name="password" value="" size="50" style="background:white;"><br><br>
+              Confirm Password:<br>
+              <input type="password" name="password2" value="" size="50" style="background:white;"><br><br>
+              <input type="submit" value="Submit">
+              <br><br>
+            </form>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td style="border-right:thin solid black;">
+        <td></td>
+      </tr>
+    </table>
+  </body>
+</html>

@@ -1,0 +1,167 @@
+body {
+    /*background-image:url('https://localhost:8443/bg.gif');*/
+    background-color:white;
+    background-repeat: repeat-y;
+    font-family:Arial;
+    font-size:12px;
+}
+div {
+    padding-left:10px;
+    padding-top:10px;
+    align:left;
+}
+hr {
+    margin-top:2px;
+    margin-bottom:2px;
+    align:center;
+    background-color:grey;
+}
+td {
+    vertical-align:top;
+}
+.text_wrap {
+    white-space: -moz-pre-wrap !important;  /* Mozilla, since 1999 */
+    white-space: -pre-wrap;      /* Opera 4-6 */
+    white-space: -o-pre-wrap;    /* Opera 7 */
+    white-space: pre-wrap;       /* css-3 */
+    word-wrap: break-word;       /* Internet Explorer 5.5+ */
+    white-space: -webkit-pre-wrap; /* Newer versions of Chrome/Safari*/
+    word-break: break-all;
+    white-space: normal;
+    max-width:350px;
+}
+textarea {
+    font-size:11px;
+    font-family:Arial;
+    color:black;
+    background-color:white;
+    width:750px;
+    height:110;
+}
+.cmd_form {
+    color:black;
+    background-color:#f4f4f4;
+    border:thin solid #439889;
+    padding-left:10px;
+}
+.login_form {
+    color:black;
+    background-color:#f4f4f4;
+    border:thin solid #439889;
+    padding-left:50px;
+    width:650px;
+}
+.heading {
+    color:#439889;
+    text-align: center;
+    vertical-align:top;
+    font-weight:bold;
+    font-size:20px;
+    background-color:white;
+}
+.heading2 {
+    color:#439889;
+    text-align: center;
+    vertical-align:top;
+    font-weight:bold;
+    font-size:20px;
+}
+.heading3 {
+    color:#439889;
+    text-align: left;
+    vertical-align:top;
+    font-weight:bold;
+    font-size:20px;
+}
+.nav {
+    text-align: left;
+    vertical-align:top;
+    font-size:16px;
+    padding-top:10px;
+    padding-left:15px;
+    padding-right:5px;
+    background-color:white;
+    border-right:thin solid black;
+    border-top:thin solid black;
+}
+.nav_button {
+    background-color: #439889;
+    border: none;
+    border-radius: 25px;
+    color: white;
+    text-align: center;
+    font-size: 14px;
+    font-weight:bold;
+    width:140px;
+}
+/* ID's are used to represent active objects integrated with jquery */
+#log_table {
+    color:black;
+    background-color:#f4f4f4;
+    border:thin solid #439889;
+    padding-left:10px;
+    text-align:center;
+    vertical-align:top;
+    font-size:11px
+}
+#active_clients {
+    list-style: none;
+    font-size: 11px
+}
+#active_clients li:before{
+    content: "•  ";
+    inline-block;
+    color: #64dd17;
+}
+#active_users {
+    list-style: none;
+    font-size: 11px
+}
+#active_users li:before{
+    content: "•  ";
+    inline-block;
+    color: #64dd17;
+}
+/* admin.html help dropdown box */
+.tooltip {
+  position: relative;
+  display: inline-block;
+  border-bottom: 1px dotted black;
+}
+
+.tooltip .tooltiptext {
+  visibility: hidden;
+  width: 350px;
+  background-color: #555;
+  color: #fff;
+  text-align: left;
+  border-radius: 6px;
+  padding: 5px 5px;
+  position: absolute;
+  z-index: 1;
+  bottom: 125%;
+  left: 50%;
+  margin-left: -60px;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.tooltip .tooltiptext::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: #555 transparent transparent transparent;
+}
+
+.tooltip:hover .tooltiptext {
+  visibility: visible;
+  opacity: 1;
+}
+
+#dropdown_clients {
+  font-size: 11px;
+}

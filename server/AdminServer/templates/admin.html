@@ -1,0 +1,122 @@
+<html>
+  <head>
+  <title>TransportC2</title>
+    <!-- Update ExternalIP -->
+    <script type="text/javascript" src="/static/js/transport.js"></script>
+    <link rel="stylesheet" type="text/css" href="/static/css/transport.css">
+    <!-- JavaScript code for auto refresh tables-->
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+    <script>
+      // Functions for auto-refresh
+      CommandLog();
+      ActiveClients();
+      ActiveUsers();
+      //Run the getCommand every 3 seconds
+      window.setInterval(CommandLog, 3000);
+      window.setInterval(ActiveClients, 3000);
+      window.setInterval(ActiveUsers, 3000);
+    </script>
+  </head>
+
+  <body>
+    <table height="100%" width="100%" cellpadding="0" cellspacing="0">
+      <tr style="border-bottom:thin solid black;" height="65px">
+        <td  width="175px" class="heading" style="border-right:thin solid black;padding-top:5px;">
+          TransportC2
+          <hr width="120px">
+          Admin Interface
+        </td>
+	    <td style="background-color:white;" colspan="2"></td>
+      </tr>
+
+      <tr height="300px">
+        <!-- Navigation Bar -->
+	    <td class="nav">
+          <br>
+          <input class="nav_button" type="button" onclick="Home();" value="Home">
+          <br><br>
+          <input class="nav_button" type="button" onclick="AddAdmin();" value="Add Admin">
+          <br><br>
+          <input class="nav_button" type="button" onclick="PassChange();" value="Change Password">
+          <br><br>
+          <input class="nav_button" type="button" onclick="ClearCMD();" value="Clear CMD">
+          <br><br>
+          <input class="nav_button" type="button" onclick="LogOut();" value="Log Out">
+          <br><br>
+        </td>
+        <!-- CMD Input Form -->
+        <td style="border-top:thin solid black;" width="850px">
+          <div>
+            <form action="/api/cmd" method="POST" class="cmd_form">
+              <br>
+              <p class="heading2"> Command Center: </p>
+              <label>Hostname</label>
+               <select name="hostname" style="width:150px;" id="dropdown_clients">
+                 <!-- Dynamic drop down list of active clients -->
+               </select><br><br>
+              Command:<br>
+              <textarea name="command" onclick="Clear(this.id);">CMD Here</textarea><br>
+              <!-- HELP DROPDOWN CONTENT -->
+                <div style="font-size: 12px;padding: 0;" class="tooltip">Need Help?
+                  <ul style="font-size:12px;" type="square" class="tooltiptext">
+                    <li>stealth [int1] [int2]</li>
+                    <li>msfpayload [ip] [port]</li>
+                    <li>change_date [4dg yr],[month],[day]</li>
+                    <li>close</li>
+                    <li>[command]</li>
+                  </ul>
+                </div>
+              <br>
+              <br>
+              <input type="submit" value="Submit">
+              <br><br>
+            </form>
+          </div>
+        </td>
+        <!-- List Active Clients Table -->
+        <td style="border-top:thin solid black;">
+          <div>
+            <p class="heading2"><br>Active Clients:<br></p>
+            <ul id="active_clients">
+            <!-- Dynamically list of active Clients -->
+            </ul>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <!-- Spacer block under nav -->
+        <td style="border-right:thin solid black;"></td>
+        <td>
+          <div>
+            <!-- DB Log Table -->
+            <table cellpadding=4 id="log_table" width="850px">
+              <thead>
+                <tr><td colspan="5"><p class="heading2"><br>Command Log:<br><br></p></td></tr>
+                <tr>
+                  <th>User</th>
+                  <th>Agent</th>
+                  <th>Time</th>
+                  <th>Command</th>
+                  <th>Response</th>
+                </tr>
+              </thead>
+              <!-- Dynamically add DB log contents -->
+              <tbody>
+              </tbody>
+            </table>
+
+          </div>
+	    </td>
+        <!-- List Active Users Table -->
+        <td>
+          <div>
+            <p class="heading2"><br>Active Admins:<br></p>
+            <ul id="active_users">
+                <!-- Dynamic list of active users -->
+            </ul>
+          </div>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>
