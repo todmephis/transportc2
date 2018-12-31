@@ -60,12 +60,12 @@ execute
 ```
 
 
+### Contributors 
+Thanks to the following contributors that made this project possible:
+* @darneymartin
+
+
 ### Screenshots
 ![user Login](server/AdminServer/static/img/login.png)
 <br><br>
 ![Cmd_Panel](server/AdminServer/static/img/cmd.png)
-
-
-### Contributors 
-Thanks to the following contributors that made this project possible:
-@darneymartin
