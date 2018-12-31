@@ -6,7 +6,7 @@ TransportC2 is a command and control server that is able to run in the backgroun
 Why "Transport"? TransportC2 is meant to be a long-term command and control server that allows users to direct payloads to other, shorter-term channels. This is exemplified by the built-in Metasploit payload, simply execute "msfpayload 192.168.1.1 4444" to open a meterpreter session on an infected client.
 
 
-### Server
+## Server
 The TransportC2 server has two components: 
 1) An HTTPS server that runs over port 443 and accepts incoming client connections. 
 2) An HTTPS admin interface that runs over port 8443 and allows users to interact with clients via web browser. This portal requires a username and password with a default login of **admin**:**admin**. Once logged in user's can change their password and add other users to allow team sharing.
@@ -30,7 +30,7 @@ sudo systemctl status transportc2.service
 ```
 
 
-### Client
+## Client
 As of now, TransportC2 has a PoC client written in Python 2/3. Clients will make HTTPS requests to the C2 server and mimic a web connection. Variables at the top of the client file can be modified to change client check-in intervals, requesting page, etc. 
 
 #### Client Usage
@@ -60,12 +60,12 @@ execute
 ```
 
 
-### Contributors 
+## Contributors 
 Thanks to the following contributors that made this project possible:
 * @darneymartin
 
 
-### Screenshots
+## Screenshots
 ![user Login](server/AdminServer/static/img/login.png)
 <br><br>
 ![Cmd_Panel](server/AdminServer/static/img/cmd.png)
