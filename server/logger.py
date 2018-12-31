@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 # License: GPL-3.0
 
-from config import LOG_FILE
 from datetime import datetime
+from server.config import LOG_FILE
 
 def log_time():
     return datetime.now().strftime('%m-%d-%Y_%H:%M:%S')
