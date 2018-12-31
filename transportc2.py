@@ -9,6 +9,7 @@ from server.ClientServer.https import ClientServer
 from server.AdminServer.server import AdminServer
 
 try:
+    # TransportC2 v.0.0.1
     init_db()
     Thread(target=ClientServer).start()
     Thread(target=AdminServer).start()
