@@ -3,7 +3,7 @@
 ### Summary
 TransportC2 is a command and control server that is able to run in the background as a service. This allows penetration testers and red teamers the ability to spend time gathering target machines, without being tied to an active session. Interact with clients through a private web interface that requires authentication, and allows administrators to add multiple users. All logins, commands, and responses are logged to provide a traceable point of reference.
 
-Why "Transport"? TransportC2 is meant to me a long-term command and control server that allows users to direct payloads to other, shorter-term channels. This is exemplified by the built-in Metasploit payload, simply execute "msfpayload 192.168.1.1 4444" to open a meterpreter session on an infected client.
+Why "Transport"? TransportC2 is meant to be a long-term command and control server that allows users to direct payloads to other, shorter-term channels. This is exemplified by the built-in Metasploit payload, simply execute "msfpayload 192.168.1.1 4444" to open a meterpreter session on an infected client.
 
 
 ### Server
