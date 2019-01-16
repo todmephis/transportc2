@@ -3,6 +3,7 @@
 
 from os import remove, path
 from sqlite3 import connect
+from hashlib import md5
 from server.config import DATABASE_FILE
 from server.logger import logger, log_time
 
@@ -82,6 +83,7 @@ def create_tables(con):
 def default_admin(con):
     # Create default user if not exists
     if not get_adminid(con, 'admin'):
+        # Default creds left in clear text, in the event ppl want to change default value
         update_admin('admin', 'admin', 'Inactive')
 
 ##################################################################
@@ -183,15 +185,16 @@ def post_command(username, hostname, command):
 # User Table Functions
 #
 ##################################################################
-def update_admin(username, passwd, status):
+def update_admin(username, password, status):
     # update user pwd or add new user
     con = db_connect(DATABASE_FILE)
     id = get_adminid(con, username)
+    password = md5(password.encode('utf-8')).hexdigest()
     if id:
-        db_query(con, 'UPDATE ADMIN SET USERNAME="{}",PASSWORD="{}",LAST_LOGIN="{}",STATUS="{}" WHERE ADMIN_ID={};'.format(username,passwd,log_time(),status,id))
+        db_query(con, 'UPDATE ADMIN SET USERNAME="{}",PASSWORD="{}",LAST_LOGIN="{}",STATUS="{}" WHERE ADMIN_ID={};'.format(username,password,log_time(),status,id))
         logger("Admin: {} record updated".format(username))
     else:
-        db_query(con, 'INSERT INTO ADMIN (USERNAME,PASSWORD,LAST_LOGIN,STATUS) VALUES ("{}","{}","{}","{}");'.format(username,passwd,log_time(),status))
+        db_query(con, 'INSERT INTO ADMIN (USERNAME,PASSWORD,LAST_LOGIN,STATUS) VALUES ("{}","{}","{}","{}");'.format(username,password,log_time(),status))
         logger("Admin: {} user added to database".format(username))
     con.close()
     return
@@ -208,9 +211,11 @@ def admin_login(username, password):
     # used for login page to authenticate users
     result = False
     con = db_connect(DATABASE_FILE)
+    password = md5(password.encode('utf-8')).hexdigest()
     try:
         id = get_adminid(con, username)
         passwd = db_query(con, 'SELECT PASSWORD FROM ADMIN WHERE ADMIN_ID={};'.format(id))
+        print(passwd, password)
         if str(password) == str(passwd[0][0]):
             valid_login(con, id) # Set user as active in DB
             result = True
