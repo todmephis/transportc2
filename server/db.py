@@ -133,7 +133,8 @@ def cmd_check(id):
     con = db_connect(DATABASE_FILE)
     cmd = db_query(con, 'SELECT COMMAND FROM CMD WHERE CLIENT_ID = {} AND RESULT="" LIMIT 1;'.format(id))
     con.close()
-    if not cmd: return False
+    if not cmd:
+        return False
     return cmd[0][0]
 
 def update_results(client_id, data):
@@ -148,9 +149,9 @@ def active_clients():
     # List all active agents + OS Version - used for admin https site
     try:
         con = db_connect(DATABASE_FILE)
-        cmd = db_query(con, 'SELECT HOSTNAME,OS FROM CLIENT WHERE STATUS = "Active";')
+        cmd = db_query(con, 'SELECT HOSTNAME FROM CLIENT WHERE STATUS = "Active";')
         for x in cmd:
-            tmp.append("{} ({})".format(x[0],x[1]))
+            tmp.append("{}".format(x[0]))
         con.close()
         if not cmd:
             tmp = ['No Active Clients']

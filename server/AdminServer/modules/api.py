@@ -5,6 +5,8 @@ from json import dumps
 from flask import Flask, render_template, session, redirect, url_for, escape, request, Response, Blueprint
 from flask_login import login_required, current_user
 from server.db import active_clients, active_admins, cmd_log, post_command, clear_pending
+from base64 import b64decode, b64encode
+from decimal import Decimal
 
 ##################################################################
 #
@@ -28,8 +30,8 @@ class API(object):
             obj['User']= x[0]
             obj['Agent'] = x[1]
             obj['Time'] = x[2]
-            obj['Command'] = x[3]
-            obj['Response'] = x[4]
+            obj['Command'] = b64decode(x[3]).decode('utf-8')
+            obj['Response'] = b64decode(x[4]).decode('utf-8')
             DATA.append(obj)
         return Response(response=dumps(DATA, default=default), status=200, mimetype='application/json')
 
@@ -55,7 +57,8 @@ class API(object):
     @login_required
     def api_cmd():
         ## Admin Form Submission
-        post_command(current_user, request.form['hostname'],request.form['command'])
+        cmd = b64encode(request.form['command'].encode('utf-8')).decode('utf-8')
+        post_command(current_user, request.form['hostname'],cmd)
         return render_template('admin.html')
 
     @APIRoutes.route('/api/clear', methods=['GET'])
