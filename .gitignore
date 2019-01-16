@@ -2,4 +2,6 @@
 *.DS_Store
 *.service
 *.sqlite
-master.log
+*.log
+*.pem
+*.crt
