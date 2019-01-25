@@ -7,9 +7,9 @@ from flask_login import login_required, current_user
 from server.config import CERT_FILE, KEY_FILE, EXTERNALIP, SSL_VERSION
 from server.db import post_command, clear_db, init_db, admin_login, update_admin, admin_logout
 
-from server.AdminServer.modules.login import Login
-from server.AdminServer.modules.error import Error
-from server.AdminServer.modules.api import API
+from server.AdminServer.core.login import Login
+from server.AdminServer.core.error import Error
+from server.AdminServer.core.api import API
 
 ##################################################################
 # Flask Application Class
@@ -57,8 +57,8 @@ class AdminServer(object):
     def change_pwd():
         if request.method == 'POST':
             if request.form['password'] == request.form['password2']:
-                update_admin(request.form['username'], request.form['password'], "Active")
+                update_admin(current_user, request.form['password'], "Active")
                 return render_template('success.html')
             else:
                 return render_template('fail.html')
-        return render_template('change_pwd.html')
+        return render_template('change_pwd.html', data=current_user)

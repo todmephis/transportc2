@@ -2,7 +2,7 @@
 # License: GPL-3.0
 
 from json import dumps
-from flask import Flask, render_template, session, redirect, url_for, escape, request, Response, Blueprint
+from flask import Flask, render_template, request, Response, Blueprint, send_from_directory
 from flask_login import login_required, current_user
 from server.db import active_clients, active_admins, cmd_log, post_command, clear_pending
 from base64 import b64decode, b64encode
@@ -37,12 +37,7 @@ class API(object):
 
     @APIRoutes.route('/api/client', methods=['GET'])
     def api_client():
-        DATA = []
-        for x in active_clients():
-            obj = {}
-            obj['Agent']= x
-            DATA.append(obj)
-        return Response(response=dumps(DATA, default=default), status=200, mimetype='application/json')
+        return Response(response=dumps(active_clients(), default=default), status=200, mimetype='application/json')
 
     @APIRoutes.route('/api/admin', methods=['GET'])
     def api_admin():
@@ -57,8 +52,12 @@ class API(object):
     @login_required
     def api_cmd():
         ## Admin Form Submission
-        cmd = b64encode(request.form['command'].encode('utf-8')).decode('utf-8')
-        post_command(current_user, request.form['hostname'],cmd)
+        clients = request.form.getlist('clients')
+        cmd = request.form['command']
+        if cmd:
+            encoded_cmd = b64encode(cmd.encode('utf-8')).decode('utf-8')
+            for cid in clients:
+                post_command(cid, current_user, encoded_cmd)
         return render_template('admin.html')
 
     @APIRoutes.route('/api/clear', methods=['GET'])
@@ -67,6 +66,11 @@ class API(object):
         ## Clear pending commands
         clear_pending()
         return render_template('admin.html')
+
+    @APIRoutes.route('/api/master_log', methods=['GET'])
+    @login_required
+    def api_masterlog():
+        return send_from_directory('../../logs/','master_log.txt')
 
 def default(obj):
     # This function is used as the default encoder for api controller - IDK what this does but it breaks without it

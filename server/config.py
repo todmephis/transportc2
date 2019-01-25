@@ -14,9 +14,6 @@ EXTERNALIP      = '127.0.0.1'
 # Set DB File Location
 DATABASE_FILE   = 'server/transportdb.sqlite'
 
-# Set TransportC2 log file location
-LOG_FILE = 'logs/master.log'
-
 # Page to signify Client connection to server - **Ensure Client version is the same
 CLIENT_PAGE      = "/main.css"
 

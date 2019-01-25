@@ -1,5 +1,5 @@
+/* Overwrite HTML Tags*/
 body {
-    /*background-image:url('https://localhost:8443/bg.gif');*/
     background-color:white;
     background-repeat: repeat-y;
     font-family:Arial;
@@ -19,38 +19,9 @@ hr {
 td {
     vertical-align:top;
 }
-.text_wrap {
-    white-space: -moz-pre-wrap !important;  /* Mozilla, since 1999 */
-    white-space: -pre-wrap;      /* Opera 4-6 */
-    white-space: -o-pre-wrap;    /* Opera 7 */
-    white-space: pre-wrap;       /* css-3 */
-    word-wrap: break-word;       /* Internet Explorer 5.5+ */
-    white-space: -webkit-pre-wrap; /* Newer versions of Chrome/Safari*/
-    word-break: break-all;
-    white-space: normal;
-    max-width:350px;
-}
-textarea {
-    font-size:11px;
-    font-family:Arial;
-    color:black;
-    background-color:white;
-    width:750px;
-    height:110;
-}
-.cmd_form {
-    color:black;
-    background-color:#f4f4f4;
-    border:thin solid #439889;
-    padding-left:10px;
-}
-.login_form {
-    color:black;
-    background-color:#f4f4f4;
-    border:thin solid #439889;
-    padding-left:50px;
-    width:650px;
-}
+
+
+/* Page Headings */
 .heading {
     color:#439889;
     text-align: center;
@@ -73,17 +44,26 @@ textarea {
     font-weight:bold;
     font-size:20px;
 }
-.nav {
-    text-align: left;
-    vertical-align:top;
-    font-size:16px;
-    padding-top:10px;
-    padding-left:15px;
-    padding-right:5px;
-    background-color:white;
-    border-right:thin solid black;
-    border-top:thin solid black;
+
+/* Login Page */
+.login_form {
+    color:black;
+    background-color:#f4f4f4;
+    border:thin solid #439889;
+    padding-left:50px;
+    width:650px;
 }
+
+
+/* Top Nav Bar */
+.nav_bar {
+ background-color:white;
+ vertical-align:bottom;
+ align:left;
+ padding-left:5px;
+ padding-bottom:5px;
+}
+
 .nav_button {
     background-color: #439889;
     border: none;
@@ -93,27 +73,36 @@ textarea {
     font-size: 14px;
     font-weight:bold;
     width:140px;
+    padding-right:5px;
 }
-/* ID's are used to represent active objects integrated with jquery */
-#log_table {
-    color:black;
-    background-color:#f4f4f4;
-    border:thin solid #439889;
-    padding-left:10px;
-    text-align:center;
+
+
+/* Active Admins User List */
+.AdminHeading {
+    color:#439889;
+    align:left;
+    text-align: left;
     vertical-align:top;
-    font-size:11px
+    font-weight:bold;
+    font-size:17px;
 }
-#active_clients {
-    list-style: none;
-    font-size: 11px
+
+.AdminList {
+    align:left;
+    text-align: left;
+    vertical-align:top;
+    font-size:16px;
+    padding-top:10px;
+    padding-left:2px;
+    padding-right:5px;
+    background-color:white;
+    border-right:thin solid black;
+    border-top:thin solid black;
 }
-#active_clients li:before{
-    content: "•  ";
-    inline-block;
-    color: #64dd17;
-}
+
 #active_users {
+    margin: 0;
+    padding: 0px 0px 0px 2px;
     list-style: none;
     font-size: 11px
 }
@@ -122,7 +111,40 @@ textarea {
     inline-block;
     color: #64dd17;
 }
-/* admin.html help dropdown box */
+
+
+/* CMD Form */
+.text_wrap {
+    white-space: -moz-pre-wrap !important;  /* Mozilla, since 1999 */
+    white-space: -pre-wrap;      /* Opera 4-6 */
+    white-space: -o-pre-wrap;    /* Opera 7 */
+    white-space: pre-wrap;       /* css-3 */
+    word-wrap: break-word;       /* Internet Explorer 5.5+ */
+    white-space: -webkit-pre-wrap; /* Newer versions of Chrome/Safari*/
+    word-break: break-all;
+    white-space: normal;
+    max-width:350px;
+}
+
+textarea {
+    font-size:11px;
+    font-family:Arial;
+    color:black;
+    background-color:white;
+    width:750px;
+    height:110;
+}
+
+.cmd_form {
+    width:850px;
+    color:black;
+    background-color:#f4f4f4;
+    border:thin solid #439889;
+    padding-left:10px;
+}
+
+
+/* CMD Form tooltip */
 .tooltip {
   position: relative;
   display: inline-block;
@@ -152,9 +174,7 @@ textarea {
   top: 100%;
   left: 50%;
   margin-left: -5px;
-  border-width: 5px;
-  border-style: solid;
-  border-color: #555 transparent transparent transparent;
+  border: 5px solid #555; transparent transparent transparent;
 }
 
 .tooltip:hover .tooltiptext {
@@ -162,6 +182,40 @@ textarea {
   opacity: 1;
 }
 
-#dropdown_clients {
+
+/* Display Active Clients Table */
+#client_table {
+  align-text:center;
+  border: .5px solid black;
+  overflow: auto;
+  display:block;
   font-size: 11px;
+  width:750px;
+  height:150px;
+  background-color: white;
+  text-align: left;
+  vertical-align:center;
+}
+
+#client_table th{
+    border-bottom: thin solid #696969;
+    vertical-align:middle;
+}
+
+#client_table td{
+    border-bottom: thin solid #696969;
+    vertical-align:middle;
+}
+
+/* Log Table Display */
+#log_table {
+    /* 10px longer to match cmd form, idk why */
+    width:860px;
+    color:black;
+    background-color:#f4f4f4;
+    border:thin solid #439889;
+    padding-left:10px;
+    text-align:center;
+    vertical-align:top;
+    font-size:11px;
 }
