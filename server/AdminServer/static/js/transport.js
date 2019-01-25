@@ -84,29 +84,30 @@ function UnSelectAll() {
 }
 
 function ActiveClients(){
+    // Delete all rows in table
+    $("#client_table tbody").empty();
     // Insert HTML for dynamic active agents
+    var counter=0
     $.getJSON("/api/client", function(data) {
-        // Delete all rows in table
-        $("#active_clients").empty();
-        $("#client_table tbody").empty();
-
         $.each(data, function(item) {
-            $("#active_clients").append($("<li>").text(data[item].Hostname));
-            $("#client_table tbody").append("<tr>");
-            $("#client_table tbody tr").append("<td>");
-            $("#client_table tbody tr td").append($("<input>",
+            var unique_chk = ("chkID" + counter);
+            var unique_row = ("rwID" + counter);
+            $("#client_table").append($("<tr>",{id: unique_row}));
+            $("#"+unique_row).append($("<td>",{id: unique_chk}));
+            $("#"+unique_chk).append($("<input>",
                 {
                     type: "checkbox",
                     value: data[item].ID,
                     name: "chkHost"
                 }));
-            $("#client_table tbody tr").append($("<td>", {text: data[item].HOSTNAME}));
-            $("#client_table tbody tr").append($("<td>", {text: data[item].OS}));
-            $("#client_table tbody tr").append($("<td>", {text: data[item].IP}));
-            $("#client_table tbody tr").append($("<td>", {text: data[item].PID}));
-            $("#client_table tbody tr").append($("<td>", {text: data[item].TYPE}));
-            $("#client_table tbody tr").append($("<td>", {text: data[item].PROTOCOL}));
-
+            $("#"+unique_row).append($("<td>", {text: data[item].HOSTNAME}));
+            $("#"+unique_row).append($("<td>", {text: data[item].OS}));
+            $("#"+unique_row).append($("<td>", {text: data[item].IP}));
+            $("#"+unique_row).append($("<td>", {text: data[item].PID}));
+            $("#"+unique_row).append($("<td>", {text: data[item].TYPE}));
+            $("#"+unique_row).append($("<td>", {text: data[item].PROTOCOL}));
+            //$("#client_table tr").append("</tr>");
+            counter++
         });
     });
 }
@@ -136,7 +137,7 @@ function CmdSubmit(){
     var clients = []
     var items = document.getElementsByName("chkHost");
     for (var i = 0; i < items.length; i++) {
-        if (items[i].type == "checkbox")
+        if (items[i].type == "checkbox" && items[i].checked)
             clients.push(items[i].value);
     }
     DATA["clients"] = clients;

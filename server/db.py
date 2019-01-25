@@ -102,10 +102,10 @@ def get_adminid(con, username):
     except:
         return False
 
-def get_clientid(con, hostname):
+def get_clientid(con, hostname, pid):
     # Get AGENT_ID from AGENTS Table using HOSTNAME value
     try:
-        return db_query(con, 'SELECT CLIENT_ID FROM CLIENT WHERE HOSTNAME="{}" LIMIT 1;'.format(hostname))[0][0]
+        return db_query(con, 'SELECT CLIENT_ID FROM CLIENT WHERE HOSTNAME="{}" and PID = {} LIMIT 1;'.format(hostname, pid))[0][0]
     except:
         return False
 
@@ -124,7 +124,7 @@ def get_hostname(con, client_id):
 def update_client(ip, hostname, os, status, pid, client_type, protocol):
     try:
         con = db_connect(DATABASE_FILE)
-        id = get_clientid(con, hostname)
+        id = get_clientid(con, hostname, pid)
         if id:
             db_query(con, 'UPDATE CLIENT SET IP="{}",HOSTNAME="{}",OS="{}",PID="{}",TYPE="{}",PROTOCOL="{}",LAST_CHECKIN="{}",STATUS="{}" WHERE CLIENT_ID={};'.format(ip,hostname,os,pid,client_type,protocol,log_time(),status,id))
             if status == 'Inactive':
@@ -132,7 +132,7 @@ def update_client(ip, hostname, os, status, pid, client_type, protocol):
         else:
             db_query(con, 'INSERT INTO CLIENT (IP,HOSTNAME,OS,PID,TYPE,PROTOCOL,LAST_CHECKIN,STATUS) VALUES ("{}","{}","{}","{}","{}","{}","{}","{}");'.format(ip,hostname,os,pid,client_type,protocol,log_time(),status))
             logger("CLIENT: New Connection from: {} ({}, {}, {})".format(hostname, ip, os, status))
-            id = get_clientid(con, hostname)
+            id = get_clientid(con, hostname, pid)
         con.close()
         return id
     except Exception as e:
