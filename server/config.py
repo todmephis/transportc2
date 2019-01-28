@@ -2,6 +2,7 @@
 # License: GPL-3.0
 
 import ssl
+from base64 import b64decode, b64encode
 
 ##################################################################
 #
@@ -59,3 +60,14 @@ def sock_recv(sock):
                 return data.decode('utf-8').rstrip('\n')
     except:
         return data.decode('utf-8').rstrip('\n')
+
+def cmd_encode(send_data):
+    # Encode data b64 encoded (really messy with byte/string formatting)
+    return b64encode(send_data.encode('utf-8')).decode('utf-8')
+
+def cmd_decode(send_data):
+    # Decode data b64 encoded (really messy with byte/string formatting)
+    try:
+        return b64decode(send_data.encode('utf-8')).decode('utf-8')
+    except Exception as e:
+        print(e)

