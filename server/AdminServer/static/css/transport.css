@@ -143,46 +143,6 @@ textarea {
     padding-left:10px;
 }
 
-
-/* CMD Form tooltip */
-.tooltip {
-  position: relative;
-  display: inline-block;
-  border-bottom: 1px dotted black;
-}
-
-.tooltip .tooltiptext {
-  visibility: hidden;
-  width: 350px;
-  background-color: #555;
-  color: #fff;
-  text-align: left;
-  border-radius: 6px;
-  padding: 5px 5px;
-  position: absolute;
-  z-index: 1;
-  bottom: 125%;
-  left: 50%;
-  margin-left: -60px;
-  opacity: 0;
-  transition: opacity 0.3s;
-}
-
-.tooltip .tooltiptext::after {
-  content: "";
-  position: absolute;
-  top: 100%;
-  left: 50%;
-  margin-left: -5px;
-  border: 5px solid #555; transparent transparent transparent;
-}
-
-.tooltip:hover .tooltiptext {
-  visibility: visible;
-  opacity: 1;
-}
-
-
 /* Display Active Clients Table */
 #client_table {
   align-text:center;
@@ -207,6 +167,28 @@ textarea {
     vertical-align:middle;
 }
 
+/* Dropdown Help Table */
+#help_table {
+  align-text:center;
+  border: .5px solid black;
+  font-size: 12px;
+  width:750px;
+  background-color: white;
+  text-align: left;
+  vertical-align:center;
+}
+
+#help_table th {
+  font-weight:bold;
+  border-bottom: thin solid #696969;
+  padding: 1px 0px 1px 2px;
+}
+
+#help_table td {
+    border-bottom: thin solid #696969;
+    padding: 1px 0px 1px 2px;
+}
+
 /* Log Table Display */
 #log_table {
     /* 10px longer to match cmd form, idk why */
@@ -215,7 +197,7 @@ textarea {
     background-color:#f4f4f4;
     border:thin solid #439889;
     padding-left:10px;
-    text-align:center;
+    text-align:left;
     vertical-align:top;
     font-size:11px;
 }

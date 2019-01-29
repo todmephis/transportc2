@@ -52,7 +52,7 @@ def clear_db():
         remove(DATABASE_FILE)
         return True
     except Exception as e:
-        print(str(e))
+        #print(str(e))
         return False
 
 def create_tables(con):
@@ -106,7 +106,7 @@ def get_clientid(con, hostname, pid):
     try:
         return db_query(con, """SELECT CLIENT_ID FROM CLIENT WHERE (HOSTNAME='{}' AND PID={}) LIMIT 1;""".format(hostname, pid))[0][0]
     except Exception as e:
-        print(e)
+        #print(e)
         return False
 
 def get_hostname(con, client_id):
@@ -133,7 +133,6 @@ def update_client(ip, hostname, os, status, pid, client_type, protocol):
         logger("CLIENT: New Connection from: {} ({}, {}, {})".format(hostname, ip, os, status))
         id = get_clientid(con, hostname, pid)
     con.close()
-    print(status)
     return id
 
 def cmd_check(id):
@@ -153,7 +152,8 @@ def update_results(client_id, data):
         logger("CMD: {} returned {}".format(get_hostname(con,client_id), cmd_decode(data)))
         con.close()
     except Exception as e:
-        print(e)
+        #print(e)
+        pass
 
 def active_clients():
     DATA = []
@@ -161,7 +161,6 @@ def active_clients():
     try:
         con = db_connect(DATABASE_FILE)
         cmd = db_query(con, """SELECT ClIENT_ID, HOSTNAME, OS, IP, PID, TYPE, PROTOCOL FROM CLIENT WHERE STATUS = 'Active';""")
-        print(cmd)
         for x in cmd:
             tmp = {}
             tmp["ID"]       = x[0]
@@ -265,5 +264,5 @@ def cmd_log():
     con = db_connect(DATABASE_FILE)
     results = db_query(con, """SELECT ADMIN.USERNAME, CLIENT.HOSTNAME, Time, COMMAND, RESULT from CMD JOIN ADMIN ON CMD.ADMIN_ID = ADMIN.ADMIN_ID JOIN CLIENT ON CLIENT.CLIENT_ID = CMD.CLIENT_ID ORDER BY CMD.Time desc LIMIT 5;""")
     if not results:
-        results = [["-","-","-","-","-"]]
+        results = [["-","-","-","LQo=","LQo="]]
     return results

@@ -97,7 +97,8 @@ function ActiveClients(){
             $("#"+unique_chk).append($("<input>",
                 {
                     type: "checkbox",
-                    value: data[item].ID,
+                    //pass language with client id value
+                    value: data[item].ID+":"+data[item].TYPE,
                     name: "chkHost"
                 }));
             $("#"+unique_row).append($("<td>", {text: data[item].HOSTNAME}));

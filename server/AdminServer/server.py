@@ -2,11 +2,12 @@
 # License: GPL-3.0
 
 from ssl import SSLContext
-from flask import Flask, render_template,request
+from flask import Flask, render_template,request, Markup
 from flask_login import login_required, current_user
 from server.config import CERT_FILE, KEY_FILE, EXTERNALIP, SSL_VERSION
 from server.db import post_command, clear_db, init_db, admin_login, update_admin, admin_logout
 
+from server.AdminServer.core.loader import get_help
 from server.AdminServer.core.login import Login
 from server.AdminServer.core.error import Error
 from server.AdminServer.core.api import API
@@ -15,7 +16,6 @@ from server.AdminServer.core.api import API
 # Flask Application Class
 ##################################################################
 class AdminServer(object):
-
     app = Flask(__name__)
     app.secret_key = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
 
@@ -36,7 +36,7 @@ class AdminServer(object):
     @app.route('/', methods=['GET', 'POST'])
     @login_required
     def run():
-        return render_template('admin.html')
+        return render_template('admin.html', data=Markup(get_help()))
 
     ##################################################################
     # User Modification Pages to interact with DB

@@ -6,7 +6,7 @@ from base64 import b64decode, b64encode
 
 ##################################################################
 #
-# Edit Below Variables before ./setup.sh
+# If needed, edit variables below prior to: ./setup.sh
 #
 ##################################################################
 # External IP for Admin Server links and Client Server HTTP Headers
@@ -32,7 +32,7 @@ CERT_FILE       = 'server/AdminServer/certs/cert.crt'
 # Key file for HTTPS servers - Dynamically Generated in ./setup
 KEY_FILE        = 'server/AdminServer/certs/key.pem'
 # TLS Protocol Version  - **Ensure Client version is the same
-SSL_VERSION = ssl.PROTOCOL_TLSv1_1
+SSL_VERSION = ssl.PROTOCOL_TLSv1
 
 
 ##################################################################
@@ -67,7 +67,6 @@ def cmd_encode(send_data):
 
 def cmd_decode(send_data):
     # Decode data b64 encoded (really messy with byte/string formatting)
-    try:
-        return b64decode(send_data.encode('utf-8')).decode('utf-8')
-    except Exception as e:
-        print(e)
+    if not send_data:
+        return ""
+    return b64decode(send_data.encode('utf-8')).decode('utf-8')
