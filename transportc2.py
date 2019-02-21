@@ -9,7 +9,7 @@ from server.ClientServer.server import ClientServer
 from server.AdminServer.server import AdminServer
 
 try:
-    # TransportC2 v.0.0.7
+    # TransportC2 v0.07
     init_db()
     Thread(target=ClientServer).start()
     Thread(target=AdminServer).start()

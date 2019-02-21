@@ -39,7 +39,8 @@ Run the client on a target machine:
 python3 client.py 127.0.0.1 443
 ```
 ```bash
-.\client.ps1 127.0.0.1 443
+Import-Module .\client.ps1
+Invoke-Client -ServerIP 127.0.0.1 -Port 443"
 ```
 
 #### Client Commands
