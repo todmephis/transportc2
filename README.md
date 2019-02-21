@@ -5,11 +5,10 @@
 ![](https://img.shields.io/badge/Status-PoC-orange.svg)&nbsp;&nbsp;
 ![](https://img.shields.io/badge/Development-Active-green.svg)&nbsp;&nbsp;
 
-TransportC2 is a command and control server with a full UI that allows interaction with clients through a private web interface. This allows penetration testers and red teamers the ability maintain their connection without being tied to an active session. Once logged into the admin interface, add new authorized users for team interaction and collaboration. 
-
+TransportC2 is a command and control server with a full GUI that allows interaction with clients through a private web interface. This allows penetration testers and red teamers the ability maintain their connection without being tied to an active session. Once logged into the admin interface, add new authorized users for team interaction and collaboration. 
 
 ## Server
-The TransportC2 server has two components: 
+Built in Python3, the TransportC2 server was designed for and tested on Debian based Linux Distributions, and has two components: 
 1) An HTTPS server that runs over port 443 and accepts incoming client connections. 
 2) An HTTPS admin interface that runs over port 8443 and allows users to interact with clients via web browser. This portal requires a username and password with a default login of **admin**:**admin**. Once logged in user's can change their password and add other users to allow team sharing.
 
