@@ -1,7 +1,4 @@
 # TransportC2
-
-## Summary
-
 ![](https://img.shields.io/badge/Status-PoC-orange.svg)&nbsp;&nbsp;
 ![](https://img.shields.io/badge/Development-Active-green.svg)&nbsp;&nbsp;
 
