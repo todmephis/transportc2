@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # License: GPL-3.0
 
-from server.db import admin_login, admin_logout
+from server.db import admin_login, admin_logout, db_connect
 from flask import redirect, request, Blueprint, render_template
 from flask_login import LoginManager, UserMixin, login_required, login_user, logout_user, current_user
 
@@ -43,7 +43,10 @@ class Login(object):
         ## Admin Form Submission
         if request.method == 'POST':
                 # Validate
-                if admin_login(request.form['username'], request.form['password']):
+                con = db_connect()
+                login_check = admin_login(con, request.form['username'], request.form['password'])
+                con.close()
+                if login_check:
                     user = User(request.form['username'])
                     login_user(user, remember=False)
                     return redirect("/",302)
@@ -57,6 +60,8 @@ class Login(object):
     @LoginRoutes.route("/logout")
     @login_required
     def logout():
-        admin_logout(current_user)
+        con = db_connect()
+        admin_logout(con, current_user)
+        con.close()
         logout_user()
         return redirect("/", 302)

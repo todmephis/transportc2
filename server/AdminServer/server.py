@@ -5,8 +5,7 @@ from ssl import SSLContext
 from flask import Flask, render_template,request, Markup
 from flask_login import login_required, current_user
 from server.config import CERT_FILE, KEY_FILE, EXTERNALIP, SSL_VERSION
-from server.db import post_command, clear_db, init_db, admin_login, update_admin, admin_logout
-
+from server.db import post_command, clear_db, init_db, admin_login, update_admin, admin_logout, db_connect
 from server.AdminServer.core.loader import get_help
 from server.AdminServer.core.login import Login
 from server.AdminServer.core.error import Error
@@ -15,6 +14,8 @@ from server.AdminServer.core.api import API
 ##################################################################
 # Flask Application Class
 ##################################################################
+HELP_MENU = Markup(get_help())
+
 class AdminServer(object):
     app = Flask(__name__)
     app.secret_key = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
@@ -36,7 +37,7 @@ class AdminServer(object):
     @app.route('/', methods=['GET', 'POST'])
     @login_required
     def run():
-        return render_template('admin.html', data=Markup(get_help()))
+        return render_template('admin.html', data=HELP_MENU)
 
     ##################################################################
     # User Modification Pages to interact with DB
@@ -46,7 +47,9 @@ class AdminServer(object):
     def add_admin():
         if request.method == 'POST':
             if request.form['password'] == request.form['password2']:
-                update_admin(request.form['username'], request.form['password'], "Inactive")
+                con = db_connect()
+                update_admin(con, request.form['username'], request.form['password'], "Inactive")
+                con.close()
                 return render_template('success.html')
             else:
                 return render_template('fail.html')
@@ -57,7 +60,9 @@ class AdminServer(object):
     def change_pwd():
         if request.method == 'POST':
             if request.form['password'] == request.form['password2']:
-                update_admin(current_user, request.form['password'], "Active")
+                con = db_connect()
+                update_admin(con, current_user, request.form['password'], "Active")
+                con.close()
                 return render_template('success.html')
             else:
                 return render_template('fail.html')

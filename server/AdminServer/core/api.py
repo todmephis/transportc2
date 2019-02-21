@@ -4,7 +4,7 @@
 from json import dumps
 from flask import Flask, render_template, request, Response, Blueprint, send_from_directory,Markup
 from flask_login import login_required, current_user
-from server.db import active_clients, active_admins, cmd_log, post_command, clear_pending, update_results
+from server.db import active_clients, active_admins, cmd_log, post_command, clear_pending, update_results, db_connect
 from decimal import Decimal
 from server.AdminServer.core.loader import get_help, list_modules, exec_module
 from server.config import cmd_encode, cmd_decode
@@ -14,39 +14,46 @@ from server.config import cmd_encode, cmd_decode
 # Auto refresh data tables in html through API
 #
 ##################################################################
+HELP_MENU = Markup(get_help())
+
 class API(object):
 
     def __init__(self, app):
         app.register_blueprint(self.APIRoutes)
 
-
     APIRoutes = Blueprint('APIRoutes', __name__)
-
 
     @APIRoutes.route('/api/log', methods=['GET'])
     def api_log():
         DATA = []
-        for x in cmd_log():
+        con = db_connect()
+        for x in cmd_log(con):
             obj = {}
             obj['User']= x[0]
             obj['Agent'] = x[1]
             obj['Time'] = x[2]
-            obj['Command'] = cmd_decode(x[3])
-            obj['Response'] = cmd_decode(x[4])
+            obj['Command'] = cmd_decode(x[3]).splitlines()[0]
+            obj['Response'] = cmd_decode(x[4]).strip()
             DATA.append(obj)
+        con.close()
         return Response(response=dumps(DATA, default=default), status=200, mimetype='application/json')
 
     @APIRoutes.route('/api/client', methods=['GET'])
     def api_client():
-        return Response(response=dumps(active_clients(), default=default), status=200, mimetype='application/json')
+        con = db_connect()
+        c = active_clients(con)
+        con.close()
+        return Response(response=dumps(c, default=default), status=200, mimetype='application/json')
 
     @APIRoutes.route('/api/admin', methods=['GET'])
     def api_admin():
         DATA = []
-        for x in active_admins():
+        con = db_connect()
+        for x in active_admins(con):
             obj = {}
             obj['User'] = x
             DATA.append(obj)
+        con.close()
         return Response(response=dumps(DATA, default=default), status=200, mimetype='application/json')
 
     @APIRoutes.route('/api/cmd', methods=['POST'])
@@ -54,12 +61,16 @@ class API(object):
     def api_cmd():
         ## Admin Form Submission
         c_input = request.form.getlist('clients')   # Get list of clients from form
-        cmd = request.form['command']               # Extract cmd from form
+        cmd = request.form['command'].strip()               # Extract cmd from form
+
         # Reformat clients from JS input
         try:
             clients = c_input[0].split(',')
         except:
             clients = c_input[0]
+
+        con = db_connect()
+
         # Begin checks of execution
         for c in clients:
             if c and cmd:
@@ -75,25 +86,35 @@ class API(object):
                             else:
                                 raise Exception("The client type does not support this module")
                         # Encode and Send cmd to DB for execution
-                        post_command(cid, current_user, cmd_encode(cmd))
+                        post_command(con, cid, current_user, cmd_encode(cmd))
                 except Exception as e:
                     print(e)
                     # Close CMD and report error to user
-                    post_command(cid, current_user, cmd_encode(cmd))
-                    update_results(cid, cmd_encode("Server Error: {}".format(str(e))))
-        return render_template('admin.html', data=Markup(get_help()))
+                    post_command(con, cid, current_user, cmd_encode(cmd))
+                    update_results(con, cid, cmd_encode("Server Error: {}".format(str(e))))
+        con.close()
+        return render_template('admin.html', data=HELP_MENU)
 
     @APIRoutes.route('/api/clear', methods=['GET'])
     @login_required
     def api_clear():
         ## Clear pending commands
-        clear_pending()
+        con = db_connect()
+        clear_pending(con)
+        con.close()
         return render_template('admin.html', data=Markup(get_help()))
 
     @APIRoutes.route('/api/master_log', methods=['GET'])
     @login_required
     def api_masterlog():
         return send_from_directory('../../logs/','master_log.txt')
+
+    @APIRoutes.route('/api/refresh_help', methods=['GET'])
+    @login_required
+    def api_helpmenu():
+        global HELP_MENU
+        HELP_MENU = Markup(get_help())
+        return render_template('admin.html', data=HELP_MENU)
 
 def default(obj):
     # This function is used as the default encoder for api controller - IDK what this does but it breaks without it

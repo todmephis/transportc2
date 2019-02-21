@@ -32,7 +32,7 @@ CERT_FILE       = 'server/AdminServer/certs/cert.crt'
 # Key file for HTTPS servers - Dynamically Generated in ./setup
 KEY_FILE        = 'server/AdminServer/certs/key.pem'
 # TLS Protocol Version  - **Ensure Client version is the same
-SSL_VERSION = ssl.PROTOCOL_TLSv1
+SSL_VERSION = ssl.PROTOCOL_TLSv1_2
 
 
 ##################################################################

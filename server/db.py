@@ -12,9 +12,9 @@ from server.logger import logger, log_time
 # General connection / query functions
 #
 ##################################################################
-def db_connect(filename):
+def db_connect():
     try:
-        return connect(filename, timeout=3)
+        return connect(DATABASE_FILE, timeout=3, check_same_thread=False)
     except:
         return False
 
@@ -37,7 +37,7 @@ def init_db():
         if not path.exists(DATABASE_FILE):
             logger("Database file created")
 
-        con = db_connect(DATABASE_FILE)
+        con = db_connect()
         create_tables(con)
         default_admin(con)
         con.close()
@@ -51,8 +51,7 @@ def clear_db():
     try:
         remove(DATABASE_FILE)
         return True
-    except Exception as e:
-        #print(str(e))
+    except Exception:
         return False
 
 def create_tables(con):
@@ -87,7 +86,7 @@ def default_admin(con):
     # Create default user if not exists
     if not get_adminid(con, 'admin'):
         # Default creds left in clear text, in the event ppl want to change default value
-        update_admin('admin', 'admin', 'Inactive')
+        update_admin(con, 'admin', 'admin', 'Inactive')
 
 ##################################################################
 #
@@ -121,8 +120,7 @@ def get_hostname(con, client_id):
 # Agent Table Functions
 #
 ##################################################################
-def update_client(ip, hostname, os, status, pid, client_type, protocol):
-    con = db_connect(DATABASE_FILE)
+def update_client(con, ip, hostname, os, status, pid, client_type, protocol):
     id = get_clientid(con, hostname, pid)
     if id:
         db_query(con, """UPDATE CLIENT SET IP='{}', HOSTNAME='{}', OS='{}', PID='{}', TYPE='{}', PROTOCOL='{}', LAST_CHECKIN='{}', STATUS='{}' WHERE CLIENT_ID={};""".format(ip,hostname,os,pid,client_type,protocol,log_time(),status,id))
@@ -132,34 +130,28 @@ def update_client(ip, hostname, os, status, pid, client_type, protocol):
         db_query(con, """INSERT INTO CLIENT (IP, HOSTNAME, OS, PID, TYPE, PROTOCOL, LAST_CHECKIN, STATUS) VALUES ('{}','{}','{}','{}','{}','{}','{}','{}');""".format(ip,hostname,os,pid,client_type,protocol,log_time(),status))
         logger("CLIENT: New Connection from: {} ({}, {}, {})".format(hostname, ip, os, status))
         id = get_clientid(con, hostname, pid)
-    con.close()
     return id
 
-def cmd_check(id):
+def cmd_check(con, id):
     # Check CMD table for active results for specified ID
-    con = db_connect(DATABASE_FILE)
     cmd = db_query(con, """SELECT COMMAND FROM CMD WHERE CLIENT_ID={} AND RESULT='' LIMIT 1;""".format(id))
-    con.close()
     if not cmd:
         return False
     return cmd[0][0]
 
-def update_results(client_id, data):
+def update_results(con, client_id, data):
     # Add results to cmd table - used by agent server when receiving new result from client
     try:
-        con = db_connect(DATABASE_FILE)
         db_query(con, """UPDATE CMD SET RESULT='{}' WHERE CLIENT_ID={} and RESULT='' LIMIT 1;""".format(data, client_id))
-        logger("CMD: {} returned {}".format(get_hostname(con,client_id), cmd_decode(data)))
-        con.close()
+        logger("CMD: {} returned {}".format(get_hostname(con,client_id), cmd_decode(data).strip()))
     except Exception as e:
         #print(e)
         pass
 
-def active_clients():
+def active_clients(con):
     DATA = []
     # List all active agents + OS Version - used for admin https site
     try:
-        con = db_connect(DATABASE_FILE)
         cmd = db_query(con, """SELECT ClIENT_ID, HOSTNAME, OS, IP, PID, TYPE, PROTOCOL FROM CLIENT WHERE STATUS = 'Active';""")
         for x in cmd:
             tmp = {}
@@ -171,39 +163,33 @@ def active_clients():
             tmp["TYPE"]     = x[5]
             tmp["PROTOCOL"] = x[6]
             DATA.append(tmp)
-        con.close()
     except:
         DATA = []
     return DATA
 
-def clear_pending():
+def clear_pending(con):
     # clear are any commands that have no response
     try:
-        con = db_connect(DATABASE_FILE)
         for client_id in db_query(con, """SELECT CLIENT_ID FROM CMD WHERE RESULT='';""")[0]:
-            update_results(client_id, cmd_encode("Manually Cleared"))
-        con.close()
+            update_results(con, client_id, cmd_encode("Manually Cleared"))
     except:
         # Catch when clicked with no clients
         pass
 
-def post_command(client_id, username, command):
+def post_command(con, client_id, username, command):
     # Post a command from the admin http server
-    con = db_connect(DATABASE_FILE)
     admin_id = get_adminid(con,username)
     hostname = get_hostname(con, client_id)
     db_query(con, """INSERT INTO CMD (CLIENT_ID, ADMIN_ID, TIME, COMMAND, RESULT) VALUES ({},{},'{}','{}','');""".format(client_id, admin_id, log_time(),command))
-    logger("CMD: {} executed a command on {} ({})".format(username, hostname, cmd_decode(command)))
-    con.close()
+    logger("CMD: {} executed a command on {} ({})".format(username, hostname, cmd_decode(command).strip()))
 
 ##################################################################
 #
 # User Table Functions
 #
 ##################################################################
-def update_admin(username, password, status):
+def update_admin(con, username, password, status):
     # update user pwd or add new user
-    con = db_connect(DATABASE_FILE)
     id = get_adminid(con, username)
     password = md5(password.encode('utf-8')).hexdigest()
     if id:
@@ -212,22 +198,18 @@ def update_admin(username, password, status):
     else:
         db_query(con, """INSERT INTO ADMIN (USERNAME, PASSWORD, LAST_LOGIN, STATUS) VALUES ('{}','{}','{}','{}');""".format(username,password,log_time(),status))
         logger("Admin: {} user added to database".format(username))
-    con.close()
     return
 
-def active_admins():
+def active_admins(con):
     # List all active users - used for admin https site
-    con = db_connect(DATABASE_FILE)
     cmd = db_query(con, """SELECT USERNAME FROM ADMIN WHERE STATUS = 'Active';""")
-    con.close()
     if not cmd:
         return []
     return cmd
 
-def admin_login(username, password):
+def admin_login(con, username, password):
     # used for login page to authenticate users
     result = False
-    con = db_connect(DATABASE_FILE)
     password = md5(password.encode('utf-8')).hexdigest()
     try:
         id = get_adminid(con, username)
@@ -237,7 +219,6 @@ def admin_login(username, password):
             result = True
     except Exception as e:
         pass
-    con.close()
     logger("Admin: {} Login attempt: {}".format(username, str(result)))
     return result
 
@@ -245,13 +226,11 @@ def valid_login(con, id):
     # Set user status as "Active" on successful login
     db_query(con, """UPDATE ADMIN SET STATUS='Active' WHERE ADMIN_ID={}""".format(id))
 
-def admin_logout(username):
+def admin_logout(con, username):
     # Set user status as "Inactive" on logout
-    con = db_connect(DATABASE_FILE)
     admin_id = get_adminid(con, username)
     db_query(con, """UPDATE ADMIN SET STATUS='Inactive' WHERE ADMIN_ID={}""".format(admin_id))
     logger("Admin: {} Logged out".format(username))
-    con.close()
     return
 
 ##################################################################
@@ -259,9 +238,8 @@ def admin_logout(username):
 # CMDS Table (Logging) Functions
 #
 ##################################################################
-def cmd_log():
+def cmd_log(con):
     # Used in admin html to display last 5 commands and responses
-    con = db_connect(DATABASE_FILE)
     results = db_query(con, """SELECT ADMIN.USERNAME, CLIENT.HOSTNAME, Time, COMMAND, RESULT from CMD JOIN ADMIN ON CMD.ADMIN_ID = ADMIN.ADMIN_ID JOIN CLIENT ON CLIENT.CLIENT_ID = CMD.CLIENT_ID ORDER BY CMD.Time desc LIMIT 5;""")
     if not results:
         results = [["-","-","-","LQo=","LQo="]]

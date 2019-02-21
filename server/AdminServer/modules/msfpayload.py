@@ -1,9 +1,9 @@
 class TransModule:
     def __init__(self):
         self.name = "msfpayload"
-        self.description = "Execute python/meterpreter/reverse_tcp payload on client"
+        self.description = "Execute python/meterpreter/reverse_tcp payload on client (py)"
         self.author = "m8r0wn"
-        self.language = ['python']
+        self.language = ['py']
         self.usage = "msfpayload 127.0.0.1 4444"
 
         self.options = {
