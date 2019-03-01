@@ -2,19 +2,17 @@
 # License: GPL-3.0
 
 from json import dumps
-from flask import Flask, render_template, request, Response, Blueprint, send_from_directory,Markup
-from flask_login import login_required, current_user
-from server.db import active_clients, active_admins, cmd_log, post_command, clear_pending, update_results, db_connect
 from decimal import Decimal
-from server.AdminServer.core.loader import get_help, list_modules, exec_module
 from server.config import cmd_encode, cmd_decode
+from flask_login import login_required, current_user
+from flask import Flask, render_template, request, Response, Blueprint, send_from_directory,Markup
+from server.db import active_clients, active_admins, cmd_log, post_command, clear_pending, update_results, db_connect
 
 ##################################################################
 #
 # Auto refresh data tables in html through API
 #
 ##################################################################
-HELP_MENU = Markup(get_help())
 
 class API(object):
 
@@ -77,23 +75,15 @@ class API(object):
                 # clientid:type / "1:py"
                 cid, type = c.split(":")
                 try:
-                    for mod, class_obj in list_modules().items():
-                        # Check for module execution
-                        if cmd.startswith(mod):
-                            # Verify language is supported by module & client
-                            if type in class_obj.language:
-                                cmd = exec_module(mod, cmd)
-                            else:
-                                raise Exception("The client type does not support this module")
-                        # Encode and Send cmd to DB for execution
-                        post_command(con, cid, current_user, cmd_encode(cmd))
+                    # Encode and Send cmd to DB for execution
+                    post_command(con, cid, current_user, cmd_encode(cmd))
                 except Exception as e:
                     print(e)
                     # Close CMD and report error to user
                     post_command(con, cid, current_user, cmd_encode(cmd))
                     update_results(con, cid, cmd_encode("Server Error: {}".format(str(e))))
         con.close()
-        return render_template('admin.html', data=HELP_MENU)
+        return render_template('admin.html')
 
     @APIRoutes.route('/api/clear', methods=['GET'])
     @login_required
@@ -109,12 +99,6 @@ class API(object):
     def api_masterlog():
         return send_from_directory('../../logs/','master_log.txt')
 
-    @APIRoutes.route('/api/refresh_help', methods=['GET'])
-    @login_required
-    def api_helpmenu():
-        global HELP_MENU
-        HELP_MENU = Markup(get_help())
-        return render_template('admin.html', data=HELP_MENU)
 
 def default(obj):
     # This function is used as the default encoder for api controller - IDK what this does but it breaks without it

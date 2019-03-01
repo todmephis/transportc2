@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 # License: GPL-3.0
 
+from hashlib import md5
 from os import remove, path
 from sqlite3 import connect
-from hashlib import md5
-from server.config import DATABASE_FILE, cmd_decode, cmd_encode
 from server.logger import logger, log_time
+from server.config import DATABASE_FILE, cmd_decode, cmd_encode
 
 ##################################################################
 #

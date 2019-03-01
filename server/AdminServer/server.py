@@ -6,7 +6,6 @@ from flask import Flask, render_template,request, Markup
 from flask_login import login_required, current_user
 from server.config import CERT_FILE, KEY_FILE, EXTERNALIP, SSL_VERSION
 from server.db import post_command, clear_db, init_db, admin_login, update_admin, admin_logout, db_connect
-from server.AdminServer.core.loader import get_help
 from server.AdminServer.core.login import Login
 from server.AdminServer.core.error import Error
 from server.AdminServer.core.api import API
@@ -14,7 +13,6 @@ from server.AdminServer.core.api import API
 ##################################################################
 # Flask Application Class
 ##################################################################
-HELP_MENU = Markup(get_help())
 
 class AdminServer(object):
     app = Flask(__name__)
@@ -37,7 +35,7 @@ class AdminServer(object):
     @app.route('/', methods=['GET', 'POST'])
     @login_required
     def run():
-        return render_template('admin.html', data=HELP_MENU)
+        return render_template('admin.html')
 
     ##################################################################
     # User Modification Pages to interact with DB
