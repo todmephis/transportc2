@@ -1,6 +1,5 @@
 # TransportC2
 ![](https://img.shields.io/badge/Status-PoC-orange.svg)&nbsp;&nbsp;
-![](https://img.shields.io/badge/Development-Active-green.svg)&nbsp;&nbsp;
 
 TransportC2 is a command and control server with a full GUI that allows interaction with clients through a private web interface. This allows penetration testers and red teamers the ability maintain their connection without being tied to an active session. Once logged into the admin interface, add new authorized users for team interaction and collaboration. 
 
