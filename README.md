@@ -1,7 +1,7 @@
 # TransportC2
 ![](https://img.shields.io/badge/Status-PoC-orange.svg)&nbsp;&nbsp;
 
-TransportC2 is a command and control server with a full GUI that allows interaction with clients through a private web interface. This allows penetration testers and red teamers the ability maintain their connection without being tied to an active session. Once logged into the admin interface, add new authorized users for team interaction and collaboration. 
+TransportC2 is a command and control server that runs in the background as a service and allows interaction with clients through a private web interface. This allows penetration testers and red teamers the ability maintain their connection without being tied to an active session. Once logged into the admin interface, add new authorized users for team interaction and collaboration. 
 
 ## Server
 Built in Python3, the TransportC2 server was designed for and tested on Debian based Linux Distributions, and has two components: 
