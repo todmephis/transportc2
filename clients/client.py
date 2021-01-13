@@ -29,7 +29,7 @@ SLEEP_TIME1     = 2
 SLEEP_TIME2     = 5
 SECRET_KEY      = '000000000000000116s92k48dss923j640s234v849c2001qi231d950g3s9df01esdr'
 SSL_VERSION     = ssl.PROTOCOL_TLSv1_2
-KILL_DATE       = datetime(2020,6,11)
+KILL_DATE       = datetime(2022,6,11)
 
 ################################################
 # Client Default Info
